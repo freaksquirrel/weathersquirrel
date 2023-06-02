@@ -5,16 +5,17 @@ import os.path
 url_format = "https://www.jma.go.jp/bosai/amedas/data/map/YYYYMMDDHHMM00.json"  # Format of the URL time  -> YYYYMMDDHHMMSS
 replace_target = "YYYYMMDDHHMM"
 area_code = '40201'    #I use "Mito-shi" as default (Note about area codes: you can find the area code you want in the full JSON response ;) )
+area_name = 'Mito-shi (JPN)'
 
 ## Path and filenames for amedas weather data
-#iofiles_path = '/home/squirrel/repos/rbp_sensor_data/datafiles'
-iofiles_path = '/home/felipe/repos/weathersquirrel/datafiles'
+#iofiles_path = '<path to root folder of this app>/datafiles'
+iofiles_path = os.path.join(os.path.os.getcwd(), "datafiles")
 amedas_fname  = 'amedas_vals.json'
 amedas_log  = os.path.join(iofiles_path, amedas_fname)
 
 ## Path and filenames for graphs
-#graphs_path = '/var/www/html/freaksquirrel/plots/amedas/'
-graphs_path = '/home/felipe/repos/weathersquirrel/graphstmp'
+#graphs_path = '<path to root folder of this app>/graphs'
+graphs_path = os.path.join(os.path.os.getcwd(), "graphs")
 graphs_file_ext = '.png'
 graph_temp_fname = 'graph_scatter_amedas_temp_'
 graph_hum_fname = 'graph_scatter_amedas_humidity_'

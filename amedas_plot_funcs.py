@@ -23,7 +23,7 @@ def plotAmedasTempScatter(data_fname='', date_key='', plot_save_path='./'):
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -40,7 +40,7 @@ def plotAmedasTempScatter(data_fname='', date_key='', plot_save_path='./'):
     plt.grid(True)
     plt.xlim([0,(24)])
     #plt.ylim([0,(40)])
-    plt.title('Temperature @ {}'.format(date_key))
+    plt.title(f"Temperature @ {a_cfg.area_name} {date_key}")
     plt.xlabel('Time [%H]')
     plt.ylabel('Temp [Celcius]')
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
@@ -61,7 +61,7 @@ def plotAmedasHumidityScatter(data_fname='', date_key='', plot_save_path='./'):
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -78,7 +78,7 @@ def plotAmedasHumidityScatter(data_fname='', date_key='', plot_save_path='./'):
     plt.grid(True)
     plt.xlim([0,(24)])
     #plt.ylim([0,(40)])
-    plt.title('Temperature @ {}'.format(date_key))
+    plt.title(f"Temperature @ {a_cfg.area_name} {date_key}")
     plt.xlabel('Time [%H]')
     plt.ylabel('Humidity [%]')
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
@@ -98,7 +98,7 @@ def plotAmedasTempHumiScatter(data_fname='', date_key='', plot_save_path='./'):
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -114,7 +114,7 @@ def plotAmedasTempHumiScatter(data_fname='', date_key='', plot_save_path='./'):
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(xAxis,yAxis, color='limegreen', marker='v')
     plt.grid(True)
-    plt.title('Temperature / Humidity @ {}'.format(date_key))
+    plt.title(f"Temperature / Humidity @ {a_cfg.area_name} {date_key}")
     ax.set_xlabel('Time [%H]')
     ax.set_ylabel('Temp [Celcius]', color='limegreen')
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
@@ -151,7 +151,7 @@ def plotAmedasRainScatter(data_fname='', date_key='', detailed = False, plot_sav
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -175,7 +175,7 @@ def plotAmedasRainScatter(data_fname='', date_key='', detailed = False, plot_sav
     plt.grid(True)
     plt.xlim([0,(24)])
     #plt.ylim([0,(40)])
-    plt.title('{} @ {}'.format(title_str, date_key))
+    plt.title(f"{title_str} @ {a_cfg.area_name} {date_key}")
     plt.xlabel('Time [%H]')
     #plt.ylabel('Precipitation [mm]')
     plt.ylabel(label_str)
@@ -198,7 +198,7 @@ def plotAmedasWindScatter(data_fname='', date_key='', plot_save_path='./'):
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -217,7 +217,7 @@ def plotAmedasWindScatter(data_fname='', date_key='', plot_save_path='./'):
     plt.grid(True)
     plt.xlim([0,(24)])
     #plt.ylim([0,(40)])
-    plt.title('{} @ {}'.format(title_str, date_key))
+    plt.title(f"{title_str} @ {a_cfg.area_name} {date_key}")
     plt.xlabel('Time [%H]')
     plt.ylabel(label_str)
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
@@ -244,7 +244,7 @@ def plotAmedasGenericScatter(data_fname='', val_name='', date_key='', plot_save_
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -261,7 +261,7 @@ def plotAmedasGenericScatter(data_fname='', val_name='', date_key='', plot_save_
     plt.grid(True)
     plt.xlim([0,(24)])
     #plt.ylim([0,(40)])
-    plt.title('{} @ {}'.format(val_name, date_key))
+    plt.title(f"{val_name} @ {a_cfg.area_name} {date_key}.")
     plt.xlabel('Time [%H]')
     plt.ylabel('Generic [?]')
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
@@ -281,7 +281,7 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
     #get the data from the json file
     allvals = json.load(open(data_fname, 'r'))
     if date_key not in allvals.keys():
-        print('Date ({}) does not exists in the JSON file. Graph will not be created.'.format(date_key))
+        print(f"Date ({date_key}) does not exists in the JSON file. Graph will not be created.")
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
@@ -298,7 +298,7 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
     plt.grid(True)
     plt.xlim([0,(24)])
     #plt.ylim([0,(40)])
-    plt.title('{} @ {}'.format(a_cfg.graph_amedas_dic[val_name][0], date_key))
+    plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {a_cfg.area_name} {date_key}")
     plt.xlabel('Time [%H]')
     plt.ylabel(a_cfg.graph_amedas_dic[val_name][1])
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
