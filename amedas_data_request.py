@@ -127,8 +127,18 @@ def main():
         lst_date = (dt.datetime.now() - dt.timedelta(days = 1)).strftime('%Y-%m-%d')  #yesterday
         prv_date = (dt.datetime.now() - dt.timedelta(days = 8)).strftime('%Y-%m-%d')  #1 week ago
         #plot a comparison scatter graph of the temperature values from a Amedas Json file
+        # Temperature
         plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
-        print(f"Plot result was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        print(f"Plot result for temp was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        # Humidity
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='humidity', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        print(f"Plot result for himidity was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        # Wind
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='wind', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        print(f"Plot result wind was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        # Rain
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='precipitation1h', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        print(f"Plot result for rain was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
     else:
         weather_data = a_fnc.request_weather_data()
         if( weather_data ):
