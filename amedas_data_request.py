@@ -26,6 +26,7 @@ def main():
     parser.add_argument("--plot_rain", action='store_true', help="Plot precipitation values and store somewhere...")
     parser.add_argument("--plot_wind", action='store_true', help="Plot wind values and store somewhere...")
     parser.add_argument("--plot_temphum", action='store_true', help="Plot temperatur/humidity values and store somewhere...")
+    parser.add_argument("--plot_vs_temp", action='store_true', help="temporary for test..")
     parser.add_argument("--plot", default = '', help="use the name of the value for plotting")
     args = parser.parse_args()
 
@@ -121,6 +122,13 @@ def main():
         if( not target_date == check_date):
             plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name=args.plot, date_key=check_date, plot_save_path=a_cfg.graphs_path )
             print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
+    elif args.plot_vs_temp:
+        #lst_date = dt.datetime.now().strftime('%Y-%m-%d')
+        lst_date = (dt.datetime.now() - dt.timedelta(days = 1)).strftime('%Y-%m-%d')  #yesterday
+        prv_date = (dt.datetime.now() - dt.timedelta(days = 8)).strftime('%Y-%m-%d')  #1 week ago
+        #plot a comparison scatter graph of the temperature values from a Amedas Json file
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        print(f"Plot result was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
     else:
         weather_data = a_fnc.request_weather_data()
         if( weather_data ):

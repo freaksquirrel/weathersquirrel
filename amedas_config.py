@@ -23,6 +23,7 @@ graph_rain_fname = 'graph_scatter_amedas_precipitacion_'
 graph_wind_fname = 'graph_scatter_amedas_wind_'
 graph_generic_fname = 'graph_scatter_amedas_generic_'
 graph_temphum_fname = 'graph_scatter_amedas_temp-humi_'
+graph_comp_fname = 'comp_'
 
 graph_title_label = {"temp":['Temperature','Temp [C]'],
                      "humidity":['Humidity','Humidity [%]'],
