@@ -21,13 +21,10 @@ def main():
     parser.add_argument("--datetime",  help="YYYY-MM-DD-HH-MM format")
     parser.add_argument("-p", action='store_true', help="Print out values on terminal")
     parser.add_argument("--batch", action='store_true', help="Get each 10 min weather values for last hour")
-    parser.add_argument("--plot_temp", action='store_true', help="Plot temperature values and store somewhere...")
-    parser.add_argument("--plot_hum", action='store_true', help="Plot humidity values and store somewhere...")
-    parser.add_argument("--plot_rain", action='store_true', help="Plot precipitation values and store somewhere...")
-    parser.add_argument("--plot_wind", action='store_true', help="Plot wind values and store somewhere...")
-    parser.add_argument("--plot_temphum", action='store_true', help="Plot temperatur/humidity values and store somewhere...")
-    parser.add_argument("--plot_vs_temp", action='store_true', help="temporary for test..")
-    parser.add_argument("--plot", default = '', help="use the name of the value for plotting")
+    parser.add_argument("--plot_comp_week", action='store_true', help="Plot graphs that compare the weather of [1 day ago] vs [1 week ago].")
+    parser.add_argument("--plot_comp_dates", nargs=2, metavar=('date_A','date_B'), help="Plot graphs that compare the weather of 2 different dates")
+    parser.add_argument("--plot", default = '', help="Plot a category from Amedas Log file, use the name of the value for plotting (e.g. 'wind' , 'precipitation1h')")
+    parser.add_argument("--plot_composite", nargs=2, metavar=('value_A','value_B'), help="Plot graph comparing 2 categories.")
     args = parser.parse_args()
 
     # set the date for the weather data query
@@ -58,96 +55,84 @@ def main():
         weather_data = a_fnc.requestWeatherData()
         #check if datapoint is valid
         if( weather_data ):
-            print('What data -> {}'. format(weather_data))
+            print(f"Acquired data -> {weather_data}")
         else:
-            print('error... did not receive the kind of results I was expecting')
-            
+            print("Error... did not receive the kind of results I was expecting")
     elif args.batch:
         target_datetime = dt.datetime.now() - dt.timedelta(hours = 1)
         for minute in range(6):
             query_datetime = dt.datetime.strptime(target_datetime.strftime('%Y%m%d%H'+str(minute)+'0'), '%Y%m%d%H%M')
-            print('Time {} and code {}'. format(query_datetime, a_cfg.area_code))
+            print(f"Time {query_datetime} and code {a_cfg.area_code}")
             res = a_fnc.requestAndStoreWeatherInfo( query_datetime, a_cfg.area_code )
-    elif args.plot_temp:
-        target_date = dt.datetime.now().strftime('%Y-%m-%d')
-        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
-        #plot a scatter graph of the temperature values from a Amedas Json file
-        plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='temp', date_key=target_date, plot_save_path=a_cfg.graphs_path )
-        print('Plot result was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-        if( not target_date == check_date):
-            plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='temp', date_key=check_date, plot_save_path=a_cfg.graphs_path )
-            print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-    elif args.plot_hum:
-        target_date = dt.datetime.now().strftime('%Y-%m-%d')
-        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
-        #plot a scatter graph of the humidity values from a Amedas Json file
-        plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='humidity', date_key=target_date, plot_save_path=a_cfg.graphs_path )
-        print('Plot result was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-        if( not target_date == check_date):
-            plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='humidity', date_key=check_date, plot_save_path=a_cfg.graphs_path )
-            print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-    elif args.plot_temphum:
-        target_date = dt.datetime.now().strftime('%Y-%m-%d')
-        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
-        #plot a scatter graph of the temperature/humidity values from a Amedas Json file
-        plotres = a_plt_fnc.plotAmedasTempHumiScatter(data_fname=a_cfg.amedas_log, plot_save_path=a_cfg.graphs_path)
-        print('Plot result was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-        if( not target_date == check_date):
-            plotres = a_plt_fnc.plotAmedasTempHumiScatter(data_fname=a_cfg.amedas_log, date_key=check_date, plot_save_path=a_cfg.graphs_path)
-            print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-    elif args.plot_rain:
-        target_date = dt.datetime.now().strftime('%Y-%m-%d')
-        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
-        #plot a scatter graph of the precipitation values from a Amedas Json file
-        plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='precipitation1h', date_key=target_date, plot_save_path=a_cfg.graphs_path )
-        print('Plot result was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-        if( not target_date == check_date):
-            plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='precipitation1h', date_key=check_date, plot_save_path=a_cfg.graphs_path )
-            print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-    elif args.plot_wind:
-        target_date = dt.datetime.now().strftime('%Y-%m-%d')
-        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
-        #plot a scatter graph of the wind values from a Amedas Json file
-        plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='wind', date_key=target_date, plot_save_path=a_cfg.graphs_path )
-        print('Plot result was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-        if( not target_date == check_date):
-            plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name='wind', date_key=check_date, plot_save_path=a_cfg.graphs_path )
-            print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
     elif args.plot:
-        target_date = dt.datetime.now().strftime('%Y-%m-%d')
+        # Plot a single scatter graph of a certain category values from a Amedas Json file
+        # By default, use a 1-hour before now() setting to avoid blank graphs at the beggining of the day
         check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
-        #plot a scatter graph of the wind values from a Amedas Json file
-        plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name=args.plot, date_key=target_date, plot_save_path=a_cfg.graphs_path )
-        print('Plot result was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-        if( not target_date == check_date):
-            plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=a_cfg.amedas_log, val_name=args.plot, date_key=check_date, plot_save_path=a_cfg.graphs_path )
-            print('Plot result (prev day) was: {}   ({})'.format(plotres, dt.datetime.now().strftime('%Y-%m-%d %H:%M')))
-    elif args.plot_vs_temp:
-        #lst_date = dt.datetime.now().strftime('%Y-%m-%d')
+        logfile = a_fnc.buildPathFromDate( target_datetime = check_date, target = "l" )
+        graph_path = a_fnc.buildPathFromDate( target_datetime = check_date, target = "g" )
+        plotres = a_plt_fnc.plotAmedasSingleScatter( data_fname=logfile, val_name=args.plot, date_key=check_date, plot_save_path=graph_path )
+        print(f"Plot result for {args.plot} from ({check_date}) was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+    elif args.plot_composite:
+        try:
+            # try to get the values from the arguments
+            value_A, value_B = args.plot_composite
+        except ValueError as e:
+            print(f"Error: {e} -> you need to set 2 values, no more, no less. Try something like --plot_composite temp humidity")
+            return ''
+        # Plot a comparison scatter graph of values from 2 categories from a Amedas Json file
+        # By default, use a 1-hour before now() setting to avoid blank graphs at the beggining of the day
+        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
+        logfile = a_fnc.buildPathFromDate( target_datetime = check_date, target = "l" )
+        graph_path = a_fnc.buildPathFromDate( target_datetime = check_date, target = "g" )
+        plotres = a_plt_fnc.plotAmedasCompositeScatter( data_fname=logfile, val_name_A=value_A, val_name_B=value_B, date_key=check_date, plot_save_path=graph_path )
+        print(f"Plot result for {args.plot_composite} from ({check_date}) was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+    elif args.plot_comp_week:
         lst_date = (dt.datetime.now() - dt.timedelta(days = 1)).strftime('%Y-%m-%d')  #yesterday
         prv_date = (dt.datetime.now() - dt.timedelta(days = 8)).strftime('%Y-%m-%d')  #1 week ago
+        graph_path = a_fnc.buildPathFromDate( target_datetime = lst_date, target = "g" )
         #plot a comparison scatter graph of the temperature values from a Amedas Json file
         # Temperature
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
         print(f"Plot result for temp was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
         # Humidity
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='humidity', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='humidity', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
         print(f"Plot result for himidity was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
         # Wind
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='wind', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='wind', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
         print(f"Plot result wind was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
         # Rain
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( data_fname=a_cfg.amedas_log, val_name='precipitation1h', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=a_cfg.graphs_path )
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='precipitation1h', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
+        print(f"Plot result for rain was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+    elif args.plot_comp_dates:
+        try:
+            # try to get the values from the arguments
+            date_A, date_B = args.plot_comp_dates
+            # and convert them to datetime format
+            lst_date = dt.datetime.strptime( date_A, '%Y-%m-%d')
+            prv_date = dt.datetime.strptime( date_B, '%Y-%m-%d')
+        except ValueError as e:
+            print(f"Error: {e} -> Try something like --plot_comp_dates 2023-11-02 2023-11-01")
+            return ''
+        graph_path = a_fnc.buildPathFromDate( target_datetime = lst_date, target = "g" )
+        #plot a comparison scatter graph of the temperature values from a Amedas Json file
+        # Temperature
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
+        print(f"Plot result for temp was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        # Humidity
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='humidity', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
+        print(f"Plot result for himidity was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        # Wind
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='wind', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
+        print(f"Plot result wind was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        # Rain
+        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='precipitation1h', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path )
         print(f"Plot result for rain was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
     else:
-        weather_data = a_fnc.request_weather_data()
-        if( weather_data ):
-            # Storage with debug mode... will call it on a cron-job and keep a log
-            res = a_fnc.addWeatherValEntry( weather_data, True, area_code, entry_date, entry_time )
-            print('Got data for the area {} at @ ({} {}) = {}'.format(area_code, entry_date, entry_time, res))
-        else:
-            print('Error! not able to get data for the area {} at @ ({} {}) = {}'.format(area_code, entry_date, entry_time, res))
+        # Default mode
+        res = a_fnc.requestAndStoreWeatherInfo()
 
 
 if __name__ == '__main__':
     sys.exit(main())
+
+#----EOF--------------------------------------------------------

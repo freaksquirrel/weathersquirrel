@@ -20,9 +20,46 @@ def createRequestUrlFromDatetime( target_datetime = "" ):
 
 # Create a URL to request weather data based on a date and time (datatime format)
 def createRequestUrlFromString( target_datetime = "" ):
-    if( target_datetime == ""): target_datetime = dt.datetime.now().strftime('%Y%m%d%H')
+    # Unless specified on the string, by default use current datetime but time as HH:00
+    if( target_datetime == ""):
+        target_datetime = dt.datetime.now().strftime('%Y%m%d%H00')
+    else:
+        try:           
+            dt.datetime.strptime( target_datetime, '%Y%m%d%H%M' )
+        except ValueError as e:
+            print(f"Error: {e}")
+            target_datetime = dt.datetime.now().strftime('%Y%m%d%H00')
+            print(f"Using datetime.now() with time as HH:00 instead -> {target_datetime}")
     amedas_req_url = a_cfg.url_format.replace(a_cfg.replace_target, target_datetime)
     return amedas_req_url
+
+
+# Form the path to the log where the entry must be saved or where the graphs are to be stored
+def buildPathFromDate( target_datetime = "", target = "" ):
+    if( target in ["g","l"] ):  # "g" for graphs path, "l" for log path
+        if( target_datetime == "" ):
+            target_datetime = dt.datetime.now()#.strftime('%Y-%m-%d')
+        elif ( not isinstance(target_datetime, dt.datetime) ):
+            try:           
+                target_datetime = dt.datetime.strptime( target_datetime, '%Y-%m-%d' )
+            except ValueError as e:
+                print(f"Error: {e}")
+                target_datetime = dt.datetime.now()
+                print(f"Using datetime.now() instead -> {target_datetime}")
+        else:
+            print(f"Target date = {target_datetime}")
+        entry_year = target_datetime.strftime('%Y')
+        entry_month = target_datetime.strftime('%m')
+        if( target == "l"):
+            targetpath = a_cfg.amedas_log
+        else: # target == "g"
+            targetpath = a_cfg.graphs_path
+        targetpath = targetpath.replace(a_cfg.replace_target_year,entry_year).replace(a_cfg.replace_target_month,entry_month)
+        #print(f"\n Target path = {targetpath} \n target date = {target_datetime} \n")
+    
+        return targetpath
+    else:
+        return "ERROR: target not supported!!! use either 'g' for graph or 'l' for log path"
 
 
 # Request weather data from created URL and put the JSON result, if valid, on a dictionary
@@ -31,8 +68,6 @@ def requestWeatherData( target_datetime = "", area_code = 0 ):
     if( isinstance(target_datetime, dt.datetime) ):
         req_url = createRequestUrlFromDatetime(target_datetime)
     else:
-        # Unless specified on a string, by default request the weather for the current datetime but time as HH:00
-        if( target_datetime == "" ) : target_datetime = dt.datetime.now().strftime('%Y%m%d%H00')    
         req_url = createRequestUrlFromString(target_datetime)
     # lets try and see if we can actually get a result from the server
     try:
@@ -59,20 +94,24 @@ def requestWeatherData( target_datetime = "", area_code = 0 ):
 def addWeatherValueEntry( datapoint, debugprint = False, area_code = 0, entry_datetime = "" ):
     #check if datapoint is a dict type
     if( type(datapoint) is not dict ): return False
+    #form the path to the log where the entry must be saved
+    entry_log = buildPathFromDate( target_datetime = entry_datetime, target = "l" )
+    # create the directory if required
+    os.makedirs( os.path.dirname(entry_log), exist_ok = True )
     #Get data from file
     try:
-        if( os.path.exists(a_cfg.amedas_log) ):
+        if( os.path.exists(entry_log) ):
             #Open file in read only mode only
-            tempfile = open(a_cfg.amedas_log, 'r')
+            tempfile = open(entry_log, 'r')
             tempdata = json.load(tempfile)
             tempfile.close()
-            if( debugprint == True) : print(f"Reading data from file {a_cfg.amedas_log} \n")
+            if( debugprint == True) : print(f"Reading data from file {entry_log} \n")
         else:
             tempdata = {}
-            if( debugprint == True) : print(f"New file will be created at {a_cfg.amedas_log} \n")
-    except ValueError:
-        if( debugprint == True) : print(f"File {a_cfg.amedas_log} was empty \n creating new entry...\n")
-        print('Empty temp file')
+            if( debugprint == True) : print(f"New file will be created at {entry_log} \n")
+    except ValueError as e:
+        if( debugprint == True) : print(f"Error: {e}\n")
+        if( debugprint == True) : print(f"File {entry_log} was empty \n creating new entry...\n")
         tempdata = {}
     except IOError:
         print(f"Unexpected error: {sys.exc_info()[0:2]}")
@@ -99,31 +138,32 @@ def addWeatherValueEntry( datapoint, debugprint = False, area_code = 0, entry_da
             # consider checking if value for that time is already in the list or not
             if( debugprint == True) : print(f"Created the key {entry_date_key} and added the datapoint {datapoint_full} \n")
         #finally, re-write json file
-        tempfile = open(a_cfg.amedas_log,'w')
+        tempfile = open(entry_log,'w')
         json.dump(tempdata, tempfile, sort_keys=True)
-        if( debugprint == True) : print(f"Re-wrote data to file {a_cfg.amedas_log} \n")
+        if( debugprint == True) : print(f"Re-wrote data to file {entry_log} \n")
         tempfile.close()
         return True
     else:
-        print("error")
+        if( debugprint == True) : print(f"Error: entry_datetime format is not valid -> {entry_datetime}")
         return False
 
+    
 # to make my life easier... just put the request and add entry functions together ;)    
-def requestAndStoreWeatherInfo( target_datetime = "", area_code = 0, debugprint = True):
+def requestAndStoreWeatherInfo( target_datetime = "", area_code = 0, debugprint = True ):
     res = False
     #just in case... check the params and create some values if required
     if( not isinstance(target_datetime, dt.datetime) ): target_datetime = dt.datetime.now()
     if( not area_code ): area_code = a_cfg.area_code
-    # Reques the data from the server
-    weather_data = requestWeatherData( target_datetime, area_code)
-    print(f"Got data {weather_data}")
+    # Request the data from the server
+    weather_data = requestWeatherData( target_datetime, area_code )
+    if( debugprint == True) : print(f"Got data {weather_data}")
     #now check if the result is valid or not
     if( weather_data ):
         # Storage with debug mode... will call it on a cron-job and keep a log
         res = addWeatherValueEntry( weather_data, debugprint, area_code, target_datetime )
-        print(f"Got data for the area {area_code} at @ ({target_datetime}) = {res}")
+        if( debugprint == True) : print(f"Got data for the area {area_code} at @ ({target_datetime}) = {res}")
     else:
-        print(f"Error! not able to get data for the area {area_code} at @ ({target_datetime}) = {res}")
+        if( debugprint == True) : print(f"Error! not able to get data for the area {area_code} at @ ({target_datetime}) = {res}")
     return res
 
 #----EOF--------------------------------------------------------
