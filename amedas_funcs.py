@@ -35,7 +35,7 @@ def createRequestUrlFromString( target_datetime = "" ):
 
 
 # Form the path to the log where the entry must be saved or where the graphs are to be stored
-def buildPathFromDate( target_datetime = "", target = "" ):
+def buildPathFromDate( target_datetime = "", target = "", areacode = 'common' ):
     if( target in ["g","l"] ):  # "g" for graphs path, "l" for log path
         if( target_datetime == "" ):
             target_datetime = dt.datetime.now()#.strftime('%Y-%m-%d')
@@ -54,7 +54,8 @@ def buildPathFromDate( target_datetime = "", target = "" ):
             targetpath = a_cfg.amedas_log
         else: # target == "g"
             targetpath = a_cfg.graphs_path
-        targetpath = targetpath.replace(a_cfg.replace_target_year,entry_year).replace(a_cfg.replace_target_month,entry_month)
+        #targetpath = targetpath.replace(a_cfg.replace_target_year,entry_year).replace(a_cfg.replace_target_month,entry_month)
+        targetpath = targetpath.replace(a_cfg.replace_target_year,entry_year).replace(a_cfg.replace_target_month,entry_month).replace(a_cfg.replace_target_areacode,areacode)
         #print(f"\n Target path = {targetpath} \n target date = {target_datetime} \n")
     
         return targetpath
@@ -81,7 +82,8 @@ def requestWeatherData( target_datetime = "", area_code = 0 ):
     else:
         raw_data = json.loads(weather_response.read().decode("utf-8"))
         #use the dafault area code unless specified
-        if( not area_code ): area_code = a_cfg.area_code
+        if( not area_code ): area_code = a_cfg.area_code 
+        print(f"The area code -> {area_code} and its type {type(area_code)}")
         if( area_code in raw_data ):
             area_weather_info = raw_data[area_code]
         else:
@@ -95,7 +97,7 @@ def addWeatherValueEntry( datapoint, debugprint = False, area_code = 0, entry_da
     #check if datapoint is a dict type
     if( type(datapoint) is not dict ): return False
     #form the path to the log where the entry must be saved
-    entry_log = buildPathFromDate( target_datetime = entry_datetime, target = "l" )
+    entry_log = buildPathFromDate( target_datetime = entry_datetime, target = "l", areacode = area_code )
     # create the directory if required
     os.makedirs( os.path.dirname(entry_log), exist_ok = True )
     #Get data from file

@@ -6,26 +6,28 @@ url_format = "https://www.jma.go.jp/bosai/amedas/data/map/YYYYMMDDHHMM00.json"  
 replace_target = "YYYYMMDDHHMM"
 area_code = '40201'    #I use "Mito-shi" as default (Note about area codes: you can find the area code you want in the full JSON response ;) )
 area_name = 'Mito-shi (JPN)'
+area_shortname = 'mito'
 
 ## Path and filenames for amedas weather data
 ### ----------
 # getcwd() does not work as expected when using the script via cronjob since the cronjob's working directory is not the script directory
 # use the aux_path and iofiles_path combo is you need to set a very specific path
 #aux_path = "<Set the absolute path that you want to use>"
-#iofiles_path = os.path.join(aux_path, "datafiles/YYYY/MM")
-iofiles_path = os.path.join(os.path.os.getcwd(), "datafiles/YYYY/MM")
+#iofiles_path = os.path.join(aux_path, "datafiles/ACODE/YYYY/MM")
+iofiles_path = os.path.join(os.path.os.getcwd(), "datafiles/ACODE/YYYY/MM")
 ### ----------
 amedas_fname  = 'YYYYMM_amedas_vals.json'
 amedas_log  = os.path.join(iofiles_path, amedas_fname)
 replace_target_year="YYYY"
 replace_target_month="MM"
+replace_target_areacode="ACODE"
 
 ## Path and filenames for graphs
 ### ----------
 # getcwd() does not work as expected when using the script via cronjob since the cronjob's working directory is not the script directory
 #aux_path = "<Set the absolute path that you want to use>"
-#graphs_path = os.path.join(aux_path, "graphs/YYYY/MM")
-graphs_path = os.path.join(os.path.os.getcwd(), "graphs/YYYY/MM")
+#graphs_path = os.path.join(aux_path, "graphs/ACODE/YYYY/MM")
+graphs_path = os.path.join(os.path.os.getcwd(), "graphs/ACODE/YYYY/MM")
 ### ----------
 graphs_file_ext = '.png'
 graph_generic_fname = 'graph_scatter_amedas_'

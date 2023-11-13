@@ -15,7 +15,7 @@ import amedas_funcs as a_fnc
 
 
 # Composite scatter plot of a given information (e.g. rain, temperature, wind, etc)
-def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date_key='', plot_save_path='./'):
+def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date_key='', plot_save_path='./', area_code = 0 ):
     #if there is no file given or value_name not valid, then do nothing
     if( not data_fname or val_name_A not in a_cfg.graph_amedas_dic or val_name_B not in a_cfg.graph_amedas_dic ): return False
     #if a date was not specified, then go and look for today's data
@@ -36,8 +36,10 @@ def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
     
-    yAxis  = [value[a_cfg.area_code][val_name_A][0] for key, value in todayvals_sorted.items()]
-    yAxis2 = [value[a_cfg.area_code][val_name_B][0] for key, value in todayvals_sorted.items()]
+    #yAxis  = [value[a_cfg.area_code][val_name_A][0] for key, value in todayvals_sorted.items()]
+    #yAxis2 = [value[a_cfg.area_code][val_name_B][0] for key, value in todayvals_sorted.items()]
+    yAxis  = [value[area_code][val_name_A][0] for key, value in todayvals_sorted.items()]
+    yAxis2 = [value[area_code][val_name_B][0] for key, value in todayvals_sorted.items()]
     #set the X axis as a float describing the hour of the day (e.g., 13.5 = 13:30) 
     xAxis = [0]*len(yAxis)
     for (index, (key, value)) in enumerate(todayvals_sorted.items()):
@@ -71,7 +73,7 @@ def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date
 
 
 # Simple scatter plot of a given information (e.g. rain, temperature, wind, etc)
-def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_path='./'):
+def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_path='./', area_code = 0 ):
     #if there is no file given or value_name not valid, then do nothing
     if( not data_fname or val_name not in a_cfg.graph_amedas_dic ): return False
     #if a date was not specified, then go and look for today's data
@@ -91,7 +93,8 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
-    yAxis  = [value[a_cfg.area_code][val_name][0] for key, value in todayvals_sorted.items()]
+    #yAxis  = [value[a_cfg.area_code][val_name][0] for key, value in todayvals_sorted.items()]
+    yAxis  = [value[area_code][val_name][0] for key, value in todayvals_sorted.items()]
     #set the X axis as a float describing the hour of the day (e.g., 13.5 = 13:30) 
     xAxis = [0]*len(yAxis)
     for (index, (key, value)) in enumerate(todayvals_sorted.items()):
@@ -115,7 +118,7 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
 
 # Scatter plot comparing values of a given information for 2 different dates (e.g. rain, temperature, wind, etc, for today and 1 week ago)
 # if dates are not given, the function defaults to today and yesterday data comparison
-def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst='', plot_save_path='./'):
+def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst='', plot_save_path='./', area_code = 0 ):
     #if value_name is not valid, then do nothing
     if( val_name not in a_cfg.graph_amedas_dic ): return False
     #if a date was not specified, then go and look for today's data
@@ -128,9 +131,10 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
         date_key_lst =  (dt.datetime.strptime( date_key_prv, '%Y-%m-%d') + dt.timedelta(days = 1) ).strftime('%Y-%m-%d')
     if( isinstance(date_key_prv, dt.datetime) ): date_key_prv = date_key_prv.strftime('%Y-%m-%d')
     if( isinstance(date_key_lst, dt.datetime) ): date_key_lst = date_key_lst.strftime('%Y-%m-%d')
-        
-    data_fname_prv = a_fnc.buildPathFromDate( target_datetime = date_key_prv, target = "l" )
-    data_fname_lst = a_fnc.buildPathFromDate( target_datetime = date_key_lst, target = "l" )
+    if( not area_code ): area_code = a_cfg.area_code
+    
+    data_fname_prv = a_fnc.buildPathFromDate( target_datetime = date_key_prv, target = "l", areacode = area_code)
+    data_fname_lst = a_fnc.buildPathFromDate( target_datetime = date_key_lst, target = "l", areacode = area_code)
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.graph_comp_fname + date_key_prv + 'vs' + date_key_lst + a_cfg.graphs_file_ext)
     # create the directory if required
