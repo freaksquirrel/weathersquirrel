@@ -20,7 +20,7 @@ def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date
     if( not data_fname or val_name_A not in a_cfg.graph_amedas_dic or val_name_B not in a_cfg.graph_amedas_dic ): return False
     #if a date was not specified, then go and look for today's data
     if( not date_key ): date_key = dt.date.today().strftime('%Y-%m-%d')
-    if( plot_save_path == './'): plot_save_path = a_fnc.buildPathFromDate( target_datetime = date_key, target = "g" )
+    if( plot_save_path == './'): plot_save_path = a_fnc.buildPathFromDate( target_datetime = date_key, target = "g", area_code = area_code  )
     
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name_A][2] + 'And_' + a_cfg.graph_amedas_dic[val_name_B][2] + date_key + a_cfg.graphs_file_ext)
@@ -51,7 +51,7 @@ def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date
     ax.plot(xAxis,yAxis, color='limegreen', marker='v')
     plt.grid(True)
     plt.xlim([0,(24)])
-    plt.title(f"{a_cfg.graph_amedas_dic[val_name_A][0]} / {a_cfg.graph_amedas_dic[val_name_B][0]} @ {a_cfg.area_name} {date_key}")
+    plt.title(f"{a_cfg.graph_amedas_dic[val_name_A][0]} / {a_cfg.graph_amedas_dic[val_name_B][0]} @ {a_cfg.area_info[area_code]['name']} {date_key}")
     ax.set_xlabel('Time [%H]')
     ax.set_ylabel(a_cfg.graph_amedas_dic[val_name_A][1], color='limegreen')
     if(val_name_A == "humidity"): ax.set_ylim([0,(100)])     ## TEMP solution, TODO: Set limit based on the category?
@@ -78,7 +78,7 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
     if( not data_fname or val_name not in a_cfg.graph_amedas_dic ): return False
     #if a date was not specified, then go and look for today's data
     if( not date_key ): date_key = dt.date.today().strftime('%Y-%m-%d')
-    if( plot_save_path == './'): plot_save_path = a_fnc.buildPathFromDate( target_datetime = date_key, target = "g" )
+    if( plot_save_path == './'): plot_save_path = a_fnc.buildPathFromDate( target_datetime = date_key, target = "g", area_code = area_code )
        
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + date_key + a_cfg.graphs_file_ext)
@@ -93,7 +93,6 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
         return False
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
-    #yAxis  = [value[a_cfg.area_code][val_name][0] for key, value in todayvals_sorted.items()]
     yAxis  = [value[area_code][val_name][0] for key, value in todayvals_sorted.items()]
     #set the X axis as a float describing the hour of the day (e.g., 13.5 = 13:30) 
     xAxis = [0]*len(yAxis)
@@ -106,7 +105,7 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
     plt.plot(xAxis,yAxis, color='limegreen', marker='v')
     plt.grid(True)
     plt.xlim([0,(24)])
-    plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {a_cfg.area_name} {date_key}")
+    plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {a_cfg.area_info[area_code]['name']} {date_key}")
     plt.xlabel('Time [%H]')
     plt.ylabel(a_cfg.graph_amedas_dic[val_name][1])
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
@@ -131,10 +130,10 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
         date_key_lst =  (dt.datetime.strptime( date_key_prv, '%Y-%m-%d') + dt.timedelta(days = 1) ).strftime('%Y-%m-%d')
     if( isinstance(date_key_prv, dt.datetime) ): date_key_prv = date_key_prv.strftime('%Y-%m-%d')
     if( isinstance(date_key_lst, dt.datetime) ): date_key_lst = date_key_lst.strftime('%Y-%m-%d')
-    if( not area_code ): area_code = a_cfg.area_code
+    if( not area_code ): area_code = a_cfg.area_code_def
     
-    data_fname_prv = a_fnc.buildPathFromDate( target_datetime = date_key_prv, target = "l", areacode = area_code)
-    data_fname_lst = a_fnc.buildPathFromDate( target_datetime = date_key_lst, target = "l", areacode = area_code)
+    data_fname_prv = a_fnc.buildPathFromDate( target_datetime = date_key_prv, target = "l", area_code = area_code )
+    data_fname_lst = a_fnc.buildPathFromDate( target_datetime = date_key_lst, target = "l", area_code = area_code )
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.graph_comp_fname + date_key_prv + 'vs' + date_key_lst + a_cfg.graphs_file_ext)
     # create the directory if required
@@ -171,8 +170,8 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
 
     vals_prv_sorted = ordDict(sorted(vals_prv.items()))
     vals_lst_sorted = ordDict(sorted(vals_lst.items()))
-    yAxis_prv  = [value[a_cfg.area_code][val_name][0] for key, value in vals_prv_sorted.items()]
-    yAxis_lst  = [value[a_cfg.area_code][val_name][0] for key, value in vals_lst_sorted.items()]
+    yAxis_prv  = [value[area_code][val_name][0] for key, value in vals_prv_sorted.items()]
+    yAxis_lst  = [value[area_code][val_name][0] for key, value in vals_lst_sorted.items()]
     #set the X axis as a float describing the hour of the day (e.g., 13.5 = 13:30) 
     xAxis_prv = [0]*len(yAxis_prv)
     for (index, (key, value)) in enumerate(vals_prv_sorted.items()):
@@ -189,7 +188,80 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
     plt.plot(xAxis_lst, yAxis_lst, color='deepskyblue', marker='v', label = date_key_lst)
     plt.grid(True)
     plt.xlim([0,(24)])
-    plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {a_cfg.area_name} {date_key_prv} vs {date_key_lst}")
+    plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {a_cfg.area_info[area_code]['name']} {date_key_prv} vs {date_key_lst}")
+    plt.xlabel('Time [%H]')
+    plt.legend()
+    plt.ylabel(a_cfg.graph_amedas_dic[val_name][1])
+    ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
+    #save the plot!
+    plt.savefig(plot_fname)
+    
+    return True
+
+################################################################
+# Scatter plot comparing values of a given information for 2 different areas (e.g. rain, temperature, wind, etc, for Mito and Tokyo)
+def plotAmedasCompareScatter_2areas( val_name='', area_code_A='', area_code_B='', date_key='', plot_save_path='./' ):
+    # if value_name is not valid, then do nothing
+    if( val_name not in a_cfg.graph_amedas_dic ): return False
+    # if the any of the area codes are not valid, then do nothing
+    if( area_code_A not in a_cfg.area_info or area_code_B not in a_cfg.area_info ): return False
+    #if a date was not specified, then go and look for today's data
+    if( not date_key ):
+        date_key = dt.date.today().strftime('%Y-%m-%d')
+    if( isinstance(date_key, dt.datetime) ): date_key = date_key.strftime('%Y-%m-%d')
+    
+    data_fname_areaA = a_fnc.buildPathFromDate( target_datetime = date_key, target = "l", area_code = area_code_A )
+    data_fname_areaB = a_fnc.buildPathFromDate( target_datetime = date_key, target = "l", area_code = area_code_B )
+    #create a file name for the plot
+    plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.graph_comp_fname + a_cfg.area_info[area_code_A]['short_name'] + 'vs' + a_cfg.area_info[area_code_B]['short_name'] + a_cfg.graphs_file_ext)
+    # create the directory if required
+    print(f"Plot name = {plot_fname}")
+    os.makedirs( os.path.dirname(plot_fname), exist_ok = True )
+    
+    #get the data from the json file
+    if( data_fname_areaA == data_fname_areaB ):
+        data_fname = data_fname_areaA
+        allvals = json.load(open(data_fname, 'r'))
+        if date_key not in allvals.keys():
+            print(f"Date ({date_key}) does not exists in the JSON file for area {area_code_A}. Graph will not be created.")
+            return False
+    
+        vals_areaA = allvals[date_key]
+        vals_areaB = allvals[date_key]
+    else:
+        allvals_areaA = json.load(open(data_fname_areaA, 'r'))
+        if date_key not in allvals_areaA.keys():
+            print(f"Date ({date_key}) does not exists in the JSON file for area {area_code_A}. Graph will not be created.")
+            return False
+        allvals_areaB = json.load(open(data_fname_areaB, 'r'))
+        if date_key not in allvals_areaB.keys():
+            print(f"Date ({date_key}) does not exists in the JSON file for area {area_code_B}. Graph will not be created.")
+            return False
+    
+        vals_areaA = allvals_areaA[date_key]
+        vals_areaB = allvals_areaB[date_key]
+
+    vals_areaA_sorted = ordDict(sorted(vals_areaA.items()))
+    vals_areaB_sorted = ordDict(sorted(vals_areaB.items()))
+    yAxis_areaA  = [value[area_code_A][val_name][0] for key, value in vals_areaA_sorted.items()]
+    yAxis_areaB  = [value[area_code_B][val_name][0] for key, value in vals_areaB_sorted.items()]
+    #set the X axis as a float describing the hour of the day (e.g., 13.5 = 13:30) 
+    xAxis_areaA = [0]*len(yAxis_areaA)
+    for (index, (key, value)) in enumerate(vals_areaA_sorted.items()):
+        xAxis_areaA[index] = (float(key.split(' ')[1].split(':')[0])) + (float(key.split(' ')[1].split(':')[1]) / 60)
+
+    xAxis_areaB = [0]*len(yAxis_areaB)
+    for (index, (key, value)) in enumerate(vals_areaB_sorted.items()):
+        xAxis_areaB[index] = (float(key.split(' ')[1].split(':')[0])) + (float(key.split(' ')[1].split(':')[1]) / 60)
+
+    #Format the plot   (this part is still on construction....)
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(figsize=(10, 5))
+    plt.plot(xAxis_areaA, yAxis_areaA, color='limegreen', marker='v',   label = a_cfg.area_info[area_code_A]['name'])
+    plt.plot(xAxis_areaB, yAxis_areaB, color='deepskyblue', marker='v', label = a_cfg.area_info[area_code_B]['name'])
+    plt.grid(True)
+    plt.xlim([0,(24)])
+    plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {date_key} - {a_cfg.area_info[area_code_A]['name']} vs {a_cfg.area_info[area_code_B]['name']}")
     plt.xlabel('Time [%H]')
     plt.legend()
     plt.ylabel(a_cfg.graph_amedas_dic[val_name][1])
