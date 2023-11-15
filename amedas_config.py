@@ -58,4 +58,5 @@ graph_amedas_dic = {"temp":             ['Temperature'                     ,'Tem
                     "windDirection":    ['Wind direction'                  ,'16 directions'      ,'windirection_'      ],
                     "wind":             ['Wind'                            ,'Wind [m/s]'         ,'wind_'              ] }
 
-## Win directions 北、北北東、北東、東北東、東、東南東、南東、南南東、南、南南西、南西、西南西、西、西北西、北西、北北西
+## Wind directions 北、北北東、北東、東北東、東、東南東、南東、南南東、南、南南西、南西、西南西、西、西北西、北西、北北西
+## will do something with that data later on... maybe...

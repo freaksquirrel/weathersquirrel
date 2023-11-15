@@ -9,7 +9,7 @@ import json
 import amedas_config as a_cfg
 
 # Note: seems like past data on AMEDAS is only available for the 10 days previous to current day
-# Note : Need to adjust the datetime to the closest 10min interval (round down?) when building the URL as the amedas API only work in 10min intervals
+# Note: need to adjust the datetime to the closest 10min interval (round down?) when building the URL as the amedas API only work in 10min intervals
 
 # Adjust the datetime to the closest 10min interval (round down?) to be used in the request URL
 def adjustDateTimeForURL( orig_datetime = dt.datetime.now() ):
@@ -66,60 +66,9 @@ def buildPathFromDate( target_datetime = "", target = "", area_code = '' ):
         else: # target == "g"
             targetpath = a_cfg.graphs_path
         targetpath = targetpath.replace(a_cfg.replace_target_year,entry_year).replace(a_cfg.replace_target_month,entry_month).replace(a_cfg.replace_target_areacode,area_code)
-        #print(f"\n Target path = {targetpath} \n target date = {target_datetime} \n")
         return targetpath
     else:
-        return "ERROR: target not supported!!! use either 'g' for graph or 'l' for log path and use a valid area code"
-
-
-# # Request weather data from created URL and put the JSON result, if valid, on a dictionary
-# def requestWeatherDataArea( target_datetime = "", area_code = 0 ):
-#     # check the date & time parameter first
-#     if( isinstance(target_datetime, dt.datetime) ):
-#         req_url = createRequestUrlFromDatetime(target_datetime)
-#     else:
-#         req_url = createRequestUrlFromString(target_datetime)
-#     # lets try and see if we can actually get a result from the server
-#     try:
-#         weather_response = urlopen(req_url)
-#         #print(f"url: {req_url}")
-#     except HTTPError as e:
-#         print(f"HTTP ERROR... (date/time too early or future?) code: {e.code} \n url: {req_url}")
-#         area_weather_info = "ERROR"
-#     except URLError as e:
-#         print(f"URL ERROR... reason: {e.reason} \n url: {req_url}")
-#         area_weather_info = "ERROR"
-#     else:
-#         raw_data = json.loads(weather_response.read().decode("utf-8"))
-#         # use the dafault area code unless specified
-#         if( not area_code ): area_code = a_cfg.area_code_def 
-#         if( area_code in raw_data ):
-#             area_weather_info = raw_data[area_code]
-#             print(f"Data for {a_cfg.area_info[area_code]['name']} ({a_cfg.area_info[area_code]['japanese_name']})")
-#         else:
-#             area_weather_info = "NAN"
-#     return area_weather_info
-
-
-# # Request weather data from created URL and put the JSON result, if valid, on a dictionary
-# def requestWeatherDataFull( target_datetime = "" ):
-#     # check the date & time parameter first
-#     if( isinstance(target_datetime, dt.datetime) ):
-#         req_url = createRequestUrlFromDatetime(target_datetime)
-#     else:
-#         req_url = createRequestUrlFromString(target_datetime)
-#     # lets try and see if we can actually get a result from the server
-#     try:
-#         weather_response = urlopen(req_url)
-#     except HTTPError as e:
-#         print(f"HTTP ERROR... (date/time too early or future?) code: {e.code} \n url: {req_url}")
-#         weather_info = {}
-#     except URLError as e:
-#         print(f"URL ERROR... reason: {e.reason} \n url: {req_url}")
-#         weather_info = {}
-#     else:
-#         weather_info = json.loads(weather_response.read().decode("utf-8"))
-#     return weather_info
+        return "ERROR: target not supported!!! use either 'g' for graph or 'l' for log path, and use a valid area code"
 
 
 # Request weather data from created URL and put the JSON result, if valid, on a dictionary.
@@ -133,7 +82,6 @@ def requestWeatherData( target_datetime = "", area_code = 0, request_mode = 'f' 
     # lets try and see if we can actually get a result from the server
     try:
         weather_response = urlopen(req_url)
-        #print(f"url: {req_url}")
     except HTTPError as e:
         print(f"HTTP ERROR... (date/time too early or future?) code: {e.code} \n url: {req_url}")
         weather_info = {}
@@ -235,7 +183,7 @@ def requestAndStoreSingleWeatherInfo( target_datetime = "", area_code = 0, debug
     return res
 
 
-# to make my life easier... just put the request and add entry functions together ;)    
+# to make my life easier... just put the batch-request-and-add-entry functions together ;)    
 def requestAndStoreWeatherInfo( target_datetime = "", debugprint = True ):
     success_cnt = 0
     #just in case... check the params and create some values if required

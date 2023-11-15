@@ -15,11 +15,10 @@ import amedas_plot_funcs as a_plt_fnc
 
 def main():
     parser = argparse.ArgumentParser( description="Get weather data from AMEADAS api...",  )
+    parser.add_argument("-p", action='store_true', help="Print out values on terminal (does not store values)")
     parser.add_argument("-a", "--area", type = int, default = 0, help="Specific area to request weather data")
-    parser.add_argument("--date",  help="YYYY-MM-DD format date")
-    parser.add_argument("--time",  help="HH time format")
-    #parser.add_argument("--datetime",  help="YYYY-MM-DD-HH-MM format")
-    parser.add_argument("-p", action='store_true', help="Print out values on terminal")
+    parser.add_argument("--date", help="Specific date to request weather data [YYYY-MM-DD format date]")
+    parser.add_argument("--time", help="Specific time to request weather data [HH time format]")
     parser.add_argument("-b", "--batch", action='store_true', help="Get each 10 min weather values for last hour")
     parser.add_argument("--batch_datetime", help="Specific date to request weather data in batch [YYYY-MM-DD-HH format datetime]")
     parser.add_argument("--plot_comp_week", action='store_true', help="Plot graphs that compare the weather of [1 day ago] vs [1 week ago].")
@@ -72,8 +71,8 @@ def main():
             print(f"Warning: Invalid datetime argument for batch, will use default values")
     else:
         batch_datetime = ""
-        
 
+    # Now, select ONLY one of the rest of the options
     if args.p:
         # get data from a given area at a given date/time
         weather_data = a_fnc.requestWeatherData( target_datetime = entry_datetime, area_code = area_code, request_mode = 'a' )

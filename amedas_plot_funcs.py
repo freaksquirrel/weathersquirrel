@@ -25,7 +25,6 @@ def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name_A][2] + 'And_' + a_cfg.graph_amedas_dic[val_name_B][2] + date_key + a_cfg.graphs_file_ext)
     # create the directory if required
-    print(f"Plot name = {plot_fname}")
     os.makedirs( os.path.dirname(plot_fname), exist_ok = True )
     
     #get the data from the json file
@@ -36,8 +35,6 @@ def plotAmedasCompositeScatter(data_fname='', val_name_A='', val_name_B='', date
     todayvals = allvals[date_key]
     todayvals_sorted = ordDict(sorted(todayvals.items()))
     
-    #yAxis  = [value[a_cfg.area_code][val_name_A][0] for key, value in todayvals_sorted.items()]
-    #yAxis2 = [value[a_cfg.area_code][val_name_B][0] for key, value in todayvals_sorted.items()]
     yAxis  = [value[area_code][val_name_A][0] for key, value in todayvals_sorted.items()]
     yAxis2 = [value[area_code][val_name_B][0] for key, value in todayvals_sorted.items()]
     #set the X axis as a float describing the hour of the day (e.g., 13.5 = 13:30) 
@@ -83,7 +80,6 @@ def plotAmedasSingleScatter(data_fname='', val_name='', date_key='', plot_save_p
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + date_key + a_cfg.graphs_file_ext)
     # create the directory if required
-    print(f"Plot name = {plot_fname}")
     os.makedirs( os.path.dirname(plot_fname), exist_ok = True )
     
     #get the data from the json file
@@ -137,7 +133,6 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.graph_comp_fname + date_key_prv + 'vs' + date_key_lst + a_cfg.graphs_file_ext)
     # create the directory if required
-    print(f"Plot name = {plot_fname}")
     os.makedirs( os.path.dirname(plot_fname), exist_ok = True )
     
     #get the data from the json file
@@ -152,9 +147,7 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
             return False
     
         vals_prv = allvals[date_key_prv]
-        #vals_prv_sorted = ordDict(sorted(vals_prv.items()))
         vals_lst = allvals[date_key_lst]
-        #vals_lst_sorted = ordDict(sorted(vals_lst.items()))
     else:
         allvals_prv = json.load(open(data_fname_prv, 'r'))
         if date_key_prv not in allvals_prv.keys():
@@ -198,7 +191,7 @@ def plotAmedasCompareScatter_2dates( val_name='', date_key_prv='', date_key_lst=
     
     return True
 
-################################################################
+
 # Scatter plot comparing values of a given information for 2 different areas (e.g. rain, temperature, wind, etc, for Mito and Tokyo)
 def plotAmedasCompareScatter_2areas( val_name='', area_code_A='', area_code_B='', date_key='', plot_save_path='./' ):
     # if value_name is not valid, then do nothing
@@ -215,7 +208,6 @@ def plotAmedasCompareScatter_2areas( val_name='', area_code_A='', area_code_B=''
     #create a file name for the plot
     plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.graph_comp_fname + a_cfg.area_info[area_code_A]['short_name'] + 'vs' + a_cfg.area_info[area_code_B]['short_name'] + a_cfg.graphs_file_ext)
     # create the directory if required
-    print(f"Plot name = {plot_fname}")
     os.makedirs( os.path.dirname(plot_fname), exist_ok = True )
     
     #get the data from the json file
