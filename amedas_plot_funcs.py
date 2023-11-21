@@ -206,7 +206,7 @@ def plotAmedasCompareScatter_2areas( val_name='', area_code_A='', area_code_B=''
     data_fname_areaA = a_fnc.buildPathFromDate( target_datetime = date_key, target = "l", area_code = area_code_A )
     data_fname_areaB = a_fnc.buildPathFromDate( target_datetime = date_key, target = "l", area_code = area_code_B )
     #create a file name for the plot
-    plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.graph_comp_fname + a_cfg.area_info[area_code_A]['short_name'] + 'vs' + a_cfg.area_info[area_code_B]['short_name'] + a_cfg.graphs_file_ext)
+    plot_fname = os.path.join(plot_save_path, a_cfg.graph_generic_fname + a_cfg.graph_amedas_dic[val_name][2] + a_cfg.area_info[area_code_A]['short_name'] + 'VS' + a_cfg.area_info[area_code_B]['short_name'] + '_' + date_key + a_cfg.graphs_file_ext)
     # create the directory if required
     os.makedirs( os.path.dirname(plot_fname), exist_ok = True )
     

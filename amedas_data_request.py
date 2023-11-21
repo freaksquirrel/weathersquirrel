@@ -121,8 +121,8 @@ def main():
         plotres = a_plt_fnc.plotAmedasCompositeScatter( data_fname=logfile, val_name_A=value_A, val_name_B=value_B, date_key=check_date, plot_save_path=graph_path, area_code = area_code )
         print(f"Plot result for {args.plot_composite} from ({check_date}) was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
     elif args.plot_comp_week:
-        lst_date = (dt.datetime.now() - dt.timedelta(days = 1)).strftime('%Y-%m-%d')  #yesterday
-        prv_date = (dt.datetime.now() - dt.timedelta(days = 8)).strftime('%Y-%m-%d')  #1 week ago
+        lst_date = (dt.datetime.now() - dt.timedelta(days = a_cfg.ndays_timedelta_lst)).strftime('%Y-%m-%d')  #yesterday
+        prv_date = (dt.datetime.now() - dt.timedelta(days = a_cfg.ndays_timedelta_prv)).strftime('%Y-%m-%d')  #1 week ago
         graph_path = a_fnc.buildPathFromDate( target_datetime = lst_date, target = "g", area_code = area_code )
         #plot a comparison scatter graph of the temperature values from a Amedas Json file
         # Temperature
