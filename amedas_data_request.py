@@ -15,8 +15,10 @@ import amedas_plot_funcs as a_plt_fnc
 
 def main():
     parser = argparse.ArgumentParser( description="Get weather data from AMEADAS api...",  )
+    parser.add_argument("-v", "--verbose", action="store_true", dest="debuginfo", default=False, help="Print out debug messages")
     parser.add_argument("-p", action='store_true', help="Print out values on terminal (does not store values)")
     parser.add_argument("-a", "--area", type = int, default = 0, help="Specific area to request weather data")
+    parser.add_argument("-c", "--category", nargs=1, metavar=('cat_name'), help="Specific value/category of weather data to plot")
     parser.add_argument("--date", help="Specific date to request weather data [YYYY-MM-DD format date]")
     parser.add_argument("--time", help="Specific time to request weather data [HH time format]")
     parser.add_argument("-b", "--batch", action='store_true', help="Get each 10 min weather values for last hour")
@@ -26,11 +28,15 @@ def main():
     parser.add_argument("--plot_comp_areas", nargs=2, metavar=('area_sn_A','area_sn_B'), help="Plot graphs that compare the weather of 2 different areas (ref. by short name)")
     parser.add_argument("--plot", default = '', help="Plot a category from Amedas Log file, use the name of the value for plotting (e.g. 'wind' , 'precipitation1h')")
     parser.add_argument("--plot_composite", nargs=2, metavar=('value_A','value_B'), help="Plot graph comparing 2 categories.")
+    parser.add_argument("--plot_all_areas", action='store_true', help="Plot graph comparing all areas given category.")
     args = parser.parse_args()
 
     # set now() - 10 minutes as default datetime 
     datetime_now_adjusted = dt.datetime.now() - dt.timedelta(minutes = 10)
-    
+
+    # set a default mode for category plot settings
+    cat_name = False
+
     # set the date for the weather data query
     if args.date:
         try:
@@ -56,7 +62,7 @@ def main():
     # set the entry datetime based on the arguments or the default values
     entry_datetime = entry_datetime = entry_date.strftime('%Y%m%d') + entry_time.strftime('%H%M')
     print(f"Entry datetime -> {entry_datetime}")
-    
+
     # set the region for the weather data query
     if args.area != 0 :
         area_code = str(args.area)
@@ -71,6 +77,14 @@ def main():
             print(f"Warning: Invalid datetime argument for batch, will use default values")
     else:
         batch_datetime = ""
+
+    # set the category/val for the plot
+    if args.category:
+        if( args.category[0] not in a_cfg.graph_amedas_dic ):
+            print(f"The category {args.category[0]} is not valid. Default mode operation will be set.")
+            cat_name = False
+        else:
+            cat_name = args.category[0]
 
     # Now, select ONLY one of the rest of the options
     if args.p:
@@ -124,19 +138,17 @@ def main():
         lst_date = (dt.datetime.now() - dt.timedelta(days = a_cfg.ndays_timedelta_lst)).strftime('%Y-%m-%d')  #yesterday
         prv_date = (dt.datetime.now() - dt.timedelta(days = a_cfg.ndays_timedelta_prv)).strftime('%Y-%m-%d')  #1 week ago
         graph_path = a_fnc.buildPathFromDate( target_datetime = lst_date, target = "g", area_code = area_code )
-        #plot a comparison scatter graph of the temperature values from a Amedas Json file
-        # Temperature
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result for temp was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Humidity
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='humidity', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result for himidity was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Wind
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='wind', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result wind was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Rain
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='precipitation1h', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result for rain was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        if( cat_name ):
+            # Plot the given category
+            plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name=cat_name, date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
+            print(f"Plot result for {cat_name} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        else:
+            #plot a comparison scatter graph of the default categories from an Amedas Json file
+            for def_cat in a_cfg.graph_amedas_defcats :
+                # Plot all the default categories 1 by 1
+                plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name=def_cat, date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
+                print(f"Plot result for {def_cat} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+
     elif args.plot_comp_dates:
         try:
             # try to get the values from the arguments
@@ -148,19 +160,17 @@ def main():
             print(f"Error: {e} -> Try something like --plot_comp_dates 2023-11-02 2023-11-01")
             return ''
         graph_path = a_fnc.buildPathFromDate( target_datetime = lst_date, target = "g", area_code = area_code )
-        #plot a comparison scatter graph of the temperature values from a Amedas Json file
-        # Temperature
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='temp', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result for temp was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Humidity
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='humidity', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result for himidity was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Wind
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='wind', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result wind was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Rain
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name='precipitation1h', date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
-        print(f"Plot result for rain was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        if( cat_name ):
+            # Plot the given category
+            plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name=cat_name, date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
+            print(f"Plot result for (cat_name) was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        else:
+            #plot a comparison scatter graph of the default categories from an Amedas Json file
+            for def_cat in a_cfg.graph_amedas_defcats :
+                # Plot all the default categories 1 by 1
+                plotres = a_plt_fnc.plotAmedasCompareScatter_2dates( val_name=def_cat, date_key_prv=prv_date, date_key_lst=lst_date, plot_save_path=graph_path, area_code = area_code )
+                print(f"Plot result for {def_cat} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+
     elif args.plot_comp_areas:
         try:
             # try to get the values from the arguments
@@ -180,23 +190,35 @@ def main():
         # By default, use a 1-hour before now() setting to avoid blank graphs at the beggining of the day
         check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
         graph_path = a_fnc.buildPathFromDate( target_datetime = check_date, target = "g", area_code = 'common' )
-        #plot a comparison scatter graph of the temperature values from a Amedas Json file
-        # Temperature
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2areas( val_name='temp', area_code_A=area_A, area_code_B=area_B, date_key=check_date, plot_save_path=graph_path )
-        print(f"Plot result for temp was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Humidity
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2areas( val_name='humidity', area_code_A=area_A, area_code_B=area_B, date_key=check_date, plot_save_path=graph_path )
-        print(f"Plot result for himidity was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Wind
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2areas( val_name='wind', area_code_A=area_A, area_code_B=area_B, date_key=check_date, plot_save_path=graph_path )
-        print(f"Plot result wind was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
-        # Rain
-        plotres = a_plt_fnc.plotAmedasCompareScatter_2areas( val_name='precipitation1h', area_code_A=area_A, area_code_B=area_B, date_key=check_date, plot_save_path=graph_path )
-        print(f"Plot result for rain was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        if( cat_name ):
+            # Plot the given category
+            plotres = a_plt_fnc.plotAmedasCompareScatter_2areas( val_name=cat_name, area_code_A=area_A, area_code_B=area_B, date_key=check_date, plot_save_path=graph_path )
+            print(f"Plot result for {cat_name} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        else:
+            #plot a comparison scatter graph of the default categories from an Amedas Json file
+            for def_cat in a_cfg.graph_amedas_defcats :
+                # Plot all the default categories 1 by 1
+                plotres = a_plt_fnc.plotAmedasCompareScatter_2areas( val_name=def_cat, area_code_A=area_A, area_code_B=area_B, date_key=check_date, plot_save_path=graph_path )
+                print(f"Plot result for {def_cat} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+
+    elif args.plot_all_areas:
+        # By default, use a 1-hour before now() setting to avoid blank graphs at the beggining of the day
+        check_date = (dt.datetime.now() - dt.timedelta(hours = 1)).strftime('%Y-%m-%d')
+        graph_path = a_fnc.buildPathFromDate( target_datetime = check_date, target = "g", area_code = 'common' )
+        if( cat_name ):
+            # Plot the given category
+            plotres = a_plt_fnc.plotAmedasCompareScatter_Allareas( val_name=cat_name, date_key=check_date, plot_save_path=graph_path )
+            print(f"Plot result for {cat_name} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+        else:
+            #plot a comparison scatter graph of the default categories from an Amedas Json file
+            for def_cat in a_cfg.graph_amedas_defcats :
+                # Plot all the default categories 1 by 1
+                plotres = a_plt_fnc.plotAmedasCompareScatter_Allareas( val_name=def_cat, date_key=check_date, plot_save_path=graph_path )
+                print(f"Plot result for {def_cat} was: {plotres}   ({dt.datetime.now().strftime('%Y-%m-%d %H:%M')})")
+
     else:
         # Default mode
         res = a_fnc.requestAndStoreWeatherInfo()
-
 
 if __name__ == '__main__':
     sys.exit(main())

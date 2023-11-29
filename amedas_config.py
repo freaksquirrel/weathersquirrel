@@ -6,13 +6,13 @@ url_format = "https://www.jma.go.jp/bosai/amedas/data/map/YYYYMMDDHHMM00.json"  
 replace_target = "YYYYMMDDHHMM"
 ## Area related information ('common' is used for graphs like those related to value comparison between different areas)
 ##            CODE      Area name          Area short name         Area name in japanese
-area_info = {'40201': {'name':'Mito'   , 'short_name':'mito'   , 'japanese_name':'水戸（ミト）'},
-             '44132': {'name':'Tokyo'  , 'short_name':'tokyo'  , 'japanese_name':'東京（トウキョウ）'},
-             '14163': {'name':'Sapporo', 'short_name':'sapporo', 'japanese_name':'札幌（サッポロ）'},
-             '62078': {'name':'Osaka'  , 'short_name':'osaka'  , 'japanese_name':'大阪(オオサカ)'},
-             '82182': {'name':'Fukuoka', 'short_name':'fukuoka', 'japanese_name':'福岡（フクオカ）'},
-             '91197': {'name':'Naha'   , 'short_name':'naha'   , 'japanese_name':'那覇（ナハ）'},
-             'common':{'name':'_'      , 'short_name':'comm'   , 'japanese_name':'_'}                 }
+area_info = {'40201': {'name':'Mito'   , 'short_name':'mito'   , 'japanese_name':'水戸（ミト）'      , 'color':'limegreen'  , 'marker':'v'},
+             '44132': {'name':'Tokyo'  , 'short_name':'tokyo'  , 'japanese_name':'東京（トウキョウ）', 'color':'deepskyblue', 'marker':'^'},
+             '14163': {'name':'Sapporo', 'short_name':'sapporo', 'japanese_name':'札幌（サッポロ）'  , 'color':'brown'      , 'marker':'o'},
+             '62078': {'name':'Osaka'  , 'short_name':'osaka'  , 'japanese_name':'大阪(オオサカ)'    , 'color':'pink'       , 'marker':'x'},
+             '82182': {'name':'Fukuoka', 'short_name':'fukuoka', 'japanese_name':'福岡（フクオカ）'  , 'color':'yellow'     , 'marker':'*'},
+             '91197': {'name':'Naha'   , 'short_name':'naha'   , 'japanese_name':'那覇（ナハ）'      , 'color':'red'        , 'marker':'p'},
+             'common':{'name':'_'      , 'short_name':'comm'   , 'japanese_name':'_'                 , 'color':''           , 'marker':'' } }
 area_code_def = '40201'    #I use "Mito" as default but you can change it to whatever area you want
 ## Note about area codes: you can find the area code you want in the full JSON response ;)
 ##                        also check this for more info -> https://www.jma.go.jp/bosai/map.html#5/35.246/137/&elem=temp&contents=amedas&interval=60
@@ -60,6 +60,6 @@ graph_amedas_dic = {"temp":             ['Temperature'                     ,'Tem
                     "precipitation24h": ['Precipitation (prev 24hr)'       ,'Precipitation [mm]' ,'03_precipitacion24h_'  ],
                     "windDirection":    ['Wind direction'                  ,'16 directions'      ,'04_windirection_'      ],
                     "wind":             ['Wind'                            ,'Wind [m/s]'         ,'04_wind_'              ] }
-
+graph_amedas_defcats = [list(graph_amedas_dic.keys())[0], list(graph_amedas_dic.keys())[1], list(graph_amedas_dic.keys())[7], list(graph_amedas_dic.keys())[11] ]
 ## Wind directions 北、北北東、北東、東北東、東、東南東、南東、南南東、南、南南西、南西、西南西、西、西北西、北西、北北西
 ## will do something with that data later on... maybe...
