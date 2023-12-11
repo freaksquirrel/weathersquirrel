@@ -308,7 +308,12 @@ def plotAmedasCompareScatter_Allareas( val_name='', date_key='', plot_save_path=
         plt.xlim([0,(24)])
         plt.title(f"{a_cfg.graph_amedas_dic[val_name][0]} @ {date_key}")
         plt.xlabel('Time [%H]')
-        plt.legend()
+        # Lets put the legend box below the grpah... so,shrink current axis's height by 10% on the bottom
+        plotbox = ax.get_position()
+        ax.set_position([plotbox.x0, plotbox.y0 + plotbox.height * 0.1, plotbox.width, plotbox.height * 0.9])
+        # Put a legend below current axis
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=(len(a_cfg.area_info)-1))
+        #plt.legend()
         plt.ylabel(a_cfg.graph_amedas_dic[val_name][1])
         if(val_name == "humidity"): plt.ylim([0,(100)])     ## TEMP solution, TODO: Set limit based on the category?
         ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=24))
